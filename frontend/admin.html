@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Beach Lounger</title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <i class="fas fa-umbrella-beach"></i>
+                <h2>Beach Admin</h2>
+            </div>
+            
+            <nav class="admin-nav">
+                <a href="#dashboard" class="admin-nav-item active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Дашборд</span>
+                </a>
+                <a href="#beaches" class="admin-nav-item" data-section="beaches">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <span>Пляжи</span>
+                </a>
+                <a href="#loungers" class="admin-nav-item" data-section="loungers">
+                    <i class="fas fa-chair"></i>
+                    <span>Лежаки</span>
+                </a>
+                <a href="#bookings" class="admin-nav-item" data-section="bookings">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Бронирования</span>
+                </a>
+                <a href="#users" class="admin-nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>Пользователи</span>
+                </a>
+                <a href="#settings" class="admin-nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Настройки</span>
+                </a>
+            </nav>
+            
+            <div style="margin-top: auto; padding-top: var(--spacing-xl);">
+                <a href="index.html" class="admin-nav-item">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Вернуться на сайт</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="admin-section">
+                <div class="admin-header">
+                    <h1 class="admin-title">Дашборд</h1>
+                    <div class="admin-actions">
+                        <select class="filter-select" id="periodFilter">
+                            <option value="day">Сегодня</option>
+                            <option value="week">Неделя</option>
+                            <option value="month" selected>Месяц</option>
+                            <option value="year">Год</option>
+                        </select>
+                        <button class="primary-btn">
+                            <i class="fas fa-download"></i>
+                            Экспорт
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Всего бронирований</span>
+                            <div class="stat-card-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="totalBookings">0</div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12.5%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Выручка</span>
+                            <div class="stat-card-icon">
+                                <i class="fas fa-ruble-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="totalRevenue">0 ₽</div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8.3%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Загрузка</span>
+                            <div class="stat-card-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="occupancyRate">0%</div>
+                        <div class="stat-card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-2.1%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-card-title">Активные пользователи</span>
+                            <div class="stat-card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-value" id="activeUsers">0</div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+15.7%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Бронирования по дням</h3>
+                            <div class="chart-options">
+                                <button class="chart-option-btn active" data-chart="bookings" data-period="week">Неделя</button>
+                                <button class="chart-option-btn" data-chart="bookings" data-period="month">Месяц</button>
+                            </div>
+                        </div>
+                        <canvas id="bookingsChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Популярные часы</h3>
+                        </div>
+                        <canvas id="popularHoursChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Bookings Table -->
+                <div class="data-table-container" style="margin-top: var(--spacing-xl);">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Последние бронирования</h3>
+                        <a href="#bookings" class="primary-btn">Все бронирования</a>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Клиент</th>
+                                <th>Пляж</th>
+                                <th>Лежак</th>
+                                <th>Дата</th>
+                                <th>Статус</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentBookingsTable">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Beaches Section -->
+            <section id="beaches" class="admin-section hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">Управление пляжами</h1>
+                    <div class="admin-actions">
+                        <button class="primary-btn" onclick="adminApp.showAddBeachModal()">
+                            <i class="fas fa-plus"></i>
+                            Добавить пляж
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="data-table-header">
+                        <h3 class="data-table-title">Список пляжей</h3>
+                        <div class="data-table-filters">
+                            <input type="text" class="form-control" placeholder="Поиск..." id="beachSearch">
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Адрес</th>
+                                <th>Лежаков</th>
+                                <th>Свободно</th>
+                                <th>Ср. цена</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="beachesTable">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Loungers Section -->
+            <section id="loungers" class="admin-section hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">Редактор лежаков</h1>
+                    <div class="admin-actions">
+                        <select class="filter-select" id="beachSelect">
+                            <option value="">Выберите пляж</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="lounger-editor" id="loungerEditor" style="display: none;">
+                    <div class="lounger-tools">
+                        <div class="tool-section">
+                            <h4>Тип лежака</h4>
+                            <div class="lounger-type-selector">
+                                <button class="lounger-type-btn active" data-type="standard">
+                                    <i class="fas fa-chair"></i>
+                                    <div>Стандарт</div>
+                                    <small>150₽/час</small>
+                                </button>
+                                <button class="lounger-type-btn" data-type="premium">
+                                    <i class="fas fa-couch"></i>
+                                    <div>Премиум</div>
+                                    <small>300₽/час</small>
+                                </button>
+                                <button class="lounger-type-btn" data-type="vip">
+                                    <i class="fas fa-crown"></i>
+                                    <div>VIP</div>
+                                    <small>500₽/час</small>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-section">
+                            <h4>Действия</h4>
+                            <button class="primary-btn full-width" id="addLoungerBtn">
+                                <i class="fas fa-plus"></i>
+                                Добавить лежак
+                            </button>
+                            <button class="primary-btn full-width" id="saveLoungerLayout" style="margin-top: var(--spacing-sm);">
+                                <i class="fas fa-save"></i>
+                                Сохранить расположение
+                            </button>
+                        </div>
+                        
+                        <div class="tool-section" id="selectedLoungerInfo" style="display: none;">
+                            <h4>Выбранный лежак</h4>
+                            <div class="form-group">
+                                <label>Номер</label>
+                                <input type="text" class="form-control" id="selectedLoungerNumber">
+                            </div>
+                            <div class="form-group">
+                                <label>Цена за час</label>
+                                <input type="number" class="form-control" id="selectedLoungerPrice">
+                            </div>
+                            <button class="primary-btn full-width" id="updateLoungerBtn">
+                                Обновить
+                            </button>
+                            <button class="primary-btn full-width" id="deleteLoungerBtn" style="margin-top: var(--spacing-sm); background-color: var(--danger-color);">
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="lounger-canvas" id="loungerCanvas">
+                        <!-- Loungers will be rendered here -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Bookings Section -->
+            <section id="bookings" class="admin-section hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">Управление бронированиями</h1>
+                    <div class="admin-actions">
+                        <input type="date" class="form-control" id="bookingDateFilter">
+                        <select class="filter-select" id="bookingStatusFilter">
+                            <option value="">Все статусы</option>
+                            <option value="pending">Ожидание</option>
+                            <option value="confirmed">Подтверждено</option>
+                            <option value="cancelled">Отменено</option>
+                            <option value="completed">Завершено</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Клиент</th>
+                                <th>Пляж</th>
+                                <th>Лежак</th>
+                                <th>Начало</th>
+                                <th>Окончание</th>
+                                <th>Статус</th>
+                                <th>Оплата</th>
+                                <th>Сумма</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsTable">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Add Beach Modal -->
+    <div class="modal hidden" id="addBeachModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="adminApp.closeModal('addBeachModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h3>Добавить новый пляж</h3>
+            
+            <form class="admin-form" id="addBeachForm">
+                <div class="form-group">
+                    <label>Название пляжа</label>
+                    <input type="text" class="form-control" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Адрес</label>
+                    <input type="text" class="form-control" name="address" required>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Широта</label>
+                        <input type="number" class="form-control" name="latitude" step="0.000001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Долгота</label>
+                        <input type="number" class="form-control" name="longitude" step="0.000001" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea class="form-control" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Удобства</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm);">
+                        <label>
+                            <input type="checkbox" name="wifi" value="true"> Wi-Fi
+                        </label>
+                        <label>
+                            <input type="checkbox" name="shower" value="true"> Душ
+                        </label>
+                        <label>
+                            <input type="checkbox" name="parking" value="true"> Парковка
+                        </label>
+                        <label>
+                            <input type="checkbox" name="cafe" value="true"> Кафе
+                        </label>
+                        <label>
+                            <input type="checkbox" name="lifeguard" value="true"> Спасатель
+                        </label>
+                        <label>
+                            <input type="checkbox" name="playground" value="true"> Детская площадка
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="primary-btn full-width">Добавить пляж</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

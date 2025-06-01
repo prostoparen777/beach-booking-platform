@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Тест API</h1>
+    <button onclick="testAPI()">Проверить API</button>
+    <button onclick="testBeaches()">Загрузить пляжи</button>
+    
+    <pre id="result"></pre>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        const resultEl = document.getElementById('result');
+        
+        async function testAPI() {
+            try {
+                resultEl.textContent = 'Проверяем API...\n';
+                
+                const response = await fetch(API_URL + '/health');
+                const data = await response.text();
+                
+                resultEl.textContent += `Health check: ${response.status} - ${data}\n`;
+            } catch (error) {
+                resultEl.textContent = `Ошибка: ${error.message}\n`;
+                resultEl.textContent += 'Backend не запущен на порту 5000!';
+            }
+        }
+        
+        async function testBeaches() {
+            try {
+                resultEl.textContent = 'Загружаем пляжи...\n';
+                
+                const response = await fetch(API_URL + '/api/beaches');
+                const data = await response.json();
+                
+                resultEl.textContent += `Статус: ${response.status}\n`;
+                resultEl.textContent += `Найдено пляжей: ${data.beaches ? data.beaches.length : 0}\n`;
+                resultEl.textContent += JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultEl.textContent = `Ошибка: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>
